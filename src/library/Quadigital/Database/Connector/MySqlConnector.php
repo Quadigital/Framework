@@ -12,6 +12,10 @@ namespace Quadigital\Database\Connector;
 
 use Quadigital\Database\Exception\DatabaseException;
 
+/**
+ * Class MySqlConnector
+ * @package Quadigital\Database\Connector
+ */
 class MySqlConnector extends Connector implements ConnectorInterface {
 
     /**
@@ -20,15 +24,12 @@ class MySqlConnector extends Connector implements ConnectorInterface {
      * @param  array  $options
      * @return PDO
      */
-    public function connect(array $config = array())
+    public function connect(DatabaseConfig $config)
     {
         $dsn = $this->getDsn($config);
+        $options = $this->getOptions($config->getOptions());
 
-        $options = $this->getOptions($config);
-
-        $connection = $this->createConnection($dsn, $config, $options);
-
-        return $connection;
+        return $this->createConnection($dsn, $config, $options);
     }
 
     /**
@@ -37,20 +38,13 @@ class MySqlConnector extends Connector implements ConnectorInterface {
      * @param  array   $config
      * @return string
      */
-    protected function getDsn(array $config)
+    protected function getDsn(DatabaseConfig $config)
     {
-        if (!isset($config['host'], $config['database'])) {
-            throw new DatabaseException(ERROR_E00004);
-        }
+        $dsn = "mysql:host={$config->getHost()};dbname={$config->getDatabase()}";
 
-        $host = $config['host'];
-        $database = $config['database'];
-
-        $dsn = "mysql:host={$host};dbname={$database}";
-
-        if (isset($config['port']))
+        if ($config->getPort() !== null)
         {
-            $dsn .= ";port={$config['port']}";
+            $dsn .= ";port={$config->getPort()}";
         }
 
         return $dsn;

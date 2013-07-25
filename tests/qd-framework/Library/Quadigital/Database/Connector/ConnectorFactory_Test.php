@@ -12,6 +12,7 @@ class ConnectorFactory_Test extends PHPUnit_Framework_TestCase
 {
 
     private $_dbOptions = array(
+        'rdbms' => 'mysql',
         'username' => 'root',
         'password' => 'test123',
         'port' => '3306',
@@ -23,97 +24,60 @@ class ConnectorFactory_Test extends PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('\Quadigital\Database\Exception\DatabaseException', ERROR_E00002);
 
-        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory('invalid', $this->_dbOptions);
+        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory($this->_dbOptions);
         $connectorFactory->make();
     }
 
-    public function test_setRdbms()
+    public function test_invalidRdbms_null()
     {
-        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory('invalid', $this->_dbOptions);
+        $this->setExpectedException('\Quadigital\Database\Exception\DatabaseException', ERROR_E00005);
 
-        try {
-            $connectorFactory->make();
-        } catch (\Quadigital\Database\Exception\DatabaseException $dbException) {
-            // Exception should be thrown.
-            if ($dbException->getMessage() !== ERROR_E00002) {
-                $this->fail('Incorrect database exception thrown.');
-            }
+        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory($this->_dbOptions);
+        $connectorFactory->make();
+    }
 
-            $connectorFactory->setRdbmsType('mysql');
+    public function test_invalidRdbms_incorrectType()
+    {
+        $this->setExpectedException('\Quadigital\Database\Exception\DatabaseException', ERROR_E00005);
+
+        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory($this->_dbOptions);
+        $connectorFactory->make();
+    }
+
+    public function test_correctRdbms()
+    {
+        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory($this->_dbOptions);
             /** @var \Quadigital\Database\Connector\MySqlConnector $mysqlConnector */
             $mysqlConnector = $connectorFactory->make();
 
             $this->assertInstanceOf('\PDO', $mysqlConnector,
                 'Object returned by connector factory should of been a PDO instance.');
-
-            return; // Return so that fail isn't run when there was an exception and it was caught.
-        }
-
-        $this->fail('Database exception should of been thrown.');
     }
 
     public function test_invalidConnectionOptions()
     {
         $this->setExpectedException('\Quadigital\Database\Exception\DatabaseException', ERROR_E00004);
 
-        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory('mysql', array());
+        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory(array());
         $connectorFactory->make();
     }
 
-    public function test_setConnectionOptions()
+    public function test_onlyHostAndDbNameOptions()
     {
-        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory('mysql', array());
+        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory(array(
+            'host' => 'localhost',
+            'database' => 'greetgate',
+        ));
 
-        try {
-            $connectorFactory->make();
-        } catch (\Quadigital\Database\Exception\DatabaseException $dbException) {
-            // Exception should be thrown.
-            if ($dbException->getMessage() !== ERROR_E00004) {
-                $this->fail('Incorrect database exception thrown.');
-            }
+        // Only setting the host and database names, so login credentials are still missing.
+        $this->setExpectedException('\Quadigital\Database\Exception\DatabaseException', ERROR_E00001);
 
-            // Only setting the host and database names, so login credentials are still missing.
-            $this->setExpectedException('\Quadigital\Database\Exception\DatabaseException', ERROR_E00001);
-
-            $connectorFactory->setOptions(array(
-                'host' => 'localhost',
-                'database' => 'greetgate',
-            ));
-
-            $connectorFactory->make();
-        }
-
-        $this->fail('Database exception should of been thrown.');
-    }
-
-    public function test_addConnectionOption()
-    {
-        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory('mysql', array());
-
-        try {
-            $connectorFactory->make();
-        } catch (\Quadigital\Database\Exception\DatabaseException $dbException) {
-            // Exception should be thrown.
-            if ($dbException->getMessage() !== ERROR_E00004) {
-                $this->fail('Incorrect database exception thrown.');
-            }
-
-            // Only adding the host and database names, so login credentials are still missing.
-            $this->setExpectedException('\Quadigital\Database\Exception\DatabaseException', ERROR_E00001);
-
-            $connectorFactory
-                ->addOption('host', 'localhost')
-                ->addOption('database', 'greetgate');
-
-            $connectorFactory->make();
-        }
-
-        $this->fail('Database exception should of been thrown.');
+        $connectorFactory->make();
     }
 
     public function test_mysqlConnector()
     {
-        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory('mysql', $this->_dbOptions);
+        $connectorFactory = new \Quadigital\Database\Connector\ConnectorFactory($this->_dbOptions);
         $mysqlConnector = $connectorFactory->make();
 
         $this->assertInstanceOf('\PDO', $mysqlConnector,

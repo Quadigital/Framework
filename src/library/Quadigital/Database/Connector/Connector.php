@@ -11,14 +11,16 @@ namespace Quadigital\Database\Connector;
 
 use Quadigital\Database\Exception\DatabaseException;
 
+/**
+ * Class Connector
+ * @package Quadigital\Database\Connector
+ */
 class Connector {
 
     /**
-     * The default \PDO connection options.
-     *
-     * @var array
+     * @var array The default \PDO connection options.
      */
-    protected $options = array(
+    private $_options = array(
         \PDO::ATTR_CASE => \PDO::CASE_NATURAL,
         \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
         \PDO::ATTR_ORACLE_NULLS => \PDO::NULL_NATURAL,
@@ -27,16 +29,20 @@ class Connector {
     );
 
     /**
-     * Get the PDO options based on the configuration.
+     * Get an array of options for the connection by merging the default options
+     * and the custom options passed as a parameter.
      *
-     * @param  array  $config
+     * @param array $config An array containing the custom connection options.
+     *
      * @return array
      */
-    public function getOptions(array $config)
+    public function getOptions(array $config = array())
     {
-        $options = isset($config['options']) ? $config['options'] : array();
+        if (count($config) === 0) {
+            return $this->_options;
+        }
 
-        return array_diff_key($this->options, $options) + $options;
+        return array_diff_key($this->_options, $config) + $config;
     }
 
     /**
@@ -48,33 +54,18 @@ class Connector {
      *
      * @return bool successful
      */
-    protected function createConnection($dsn, array $config, array $options)
+    protected function createConnection($dsn, DatabaseConfig $config, array $options)
     {
-        if (!isset($config['username'], $config['password'])) {
-            throw new DatabaseException(ERROR_E00001);
-        }
-
-        return new \PDO($dsn, $config['username'], $config['password'], $options);
-    }
-
-    /**
-     * Get the default \PDO connection options.
-     *
-     * @return array
-     */
-    public function getDefaultOptions()
-    {
-        return $this->options;
+        return new \PDO($dsn, $config->getUsername(), $config->getPassword(), $options);
     }
 
     /**
      * Set the default \PDO connection options.
      *
-     * @param  array  $options
      * @return void
      */
-    public function setDefaultOptions(array $options)
+    public function disableDefaultOptions()
     {
-        $this->options = $options;
+        $this->_options = array();
     }
 }

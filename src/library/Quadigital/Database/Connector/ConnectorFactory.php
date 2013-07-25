@@ -13,28 +13,41 @@ namespace Quadigital\Database\Connector;
 use Quadigital\Database\Exception\DatabaseException;
 use Quadigital\Factory\Creator;
 
+/**
+ * Class ConnectorFactory
+ * @package Quadigital\Database\Connector
+ */
 class ConnectorFactory extends Creator
 {
+    /**
+     * @var DatabaseConfig
+     */
+    private $_options;
 
-    private $_rdbmsType = null;
-    private $_options = array();
-
-    public function __construct($rdbmsType, array $options = array())
+    /**
+     * @param $rdbmsType
+     * @param array $options
+     */
+    public function __construct(array $options)
     {
-        $this->_rdbmsType = $rdbmsType;
-        $this->_options = $options;
+        $this->_options = new DatabaseConfig($options);
     }
 
+    /**
+     * @return \PDO
+     * @throws \Quadigital\Database\Exception\DatabaseException
+     */
     protected function factoryMethod()
     {
         /** @var ConnectorInterface $connector */
         $connector = null;
 
-        switch($this->_rdbmsType) {
+        switch($this->_options->getRdbms()) {
             case 'mysql':
                 $connector = new MySqlConnector();
                 break;
             default:
+                // Unrecognised rdbmsType
                 throw new DatabaseException(ERROR_E00002);
                 break;
         }
@@ -45,46 +58,5 @@ class ConnectorFactory extends Creator
         }
 
         return $connector->connect($this->_options);
-    }
-
-    // GETTERS AND SETTERS
-
-    /**
-     * @param array $options
-     */
-    public function setOptions($options)
-    {
-        $this->_options = $options;
-    }
-
-    public function addOption($key, $value)
-    {
-        $this->_options[$key] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->_options;
-    }
-
-    /**
-     * @param null $rdbmsType
-     */
-    public function setRdbmsType($rdbmsType)
-    {
-        $this->_rdbmsType = $rdbmsType;
-    }
-
-    /**
-     * @return null
-     */
-    public function getRdbmsType()
-    {
-        return $this->_rdbmsType;
     }
 }

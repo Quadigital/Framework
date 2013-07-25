@@ -11,6 +11,10 @@
 namespace Quadigital\Database\Connector;
 
 
+/**
+ * Class ConnectorInterface
+ * @package Quadigital\Database\Connector
+ */
 interface ConnectorInterface {
 
     /**
@@ -20,6 +24,6 @@ interface ConnectorInterface {
      *
      * @return \PDO
      */
-    public function connect(array $config = array());
+    public function connect(DatabaseConfig $config);
 
 }
