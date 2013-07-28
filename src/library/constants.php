@@ -20,9 +20,12 @@ define('MODULE_DIR', ROOT_DIR . DS . 'module' . DS);
 define('DEBUG', false);
 define('START_TIME', microtime(true));
 
-// Errors
-define('ERROR_E00001', 'The database login credentials must both be set.');
-define('ERROR_E00002', 'The RDBMS type you specified is not supported.');
-define('ERROR_E00003', 'The database connector instance is null.');
-define('ERROR_E00004', 'The database name and host must be set.');
-define('ERROR_E00005', 'The RDBMS type must be provided as a string containing only alphabetic characters.');
+// Error
+define('ERROR_E00001', 'The RDBMS type you specified is not supported.');
+define('ERROR_E00002', 'The database connector instance is null.');
+define('ERROR_E00003', 'RDBMS is required and must be a string.');
+define('ERROR_E00004', 'Database username and password are required and must be strings.');
+define('ERROR_E00005', 'Database host and database are required and must be strings.');
+define('ERROR_E00006', 'Database port is optional but must be an integer if it is set.');
+define('ERROR_E00007', 'Connection options are optional but must be passed as an array if set.');
+define('ERROR_E00008', 'Database port must be in the valid port range (0-65535).');

@@ -48,13 +48,13 @@ class ConnectorFactory extends Creator
                 break;
             default:
                 // Unrecognised rdbmsType
-                throw new DatabaseException(ERROR_E00002);
+                throw new DatabaseException(ERROR_E00001);
                 break;
         }
 
         if (!$connector instanceof Connector) {
             // Fail-safe in case connector wasn't set properly.
-            throw new DatabaseException(ERROR_E00003);
+            throw new DatabaseException(ERROR_E00002);
         }
 
         return $connector->connect($this->_options);
