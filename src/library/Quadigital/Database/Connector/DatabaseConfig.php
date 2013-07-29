@@ -25,42 +25,66 @@ class DatabaseConfig
 
     public function setFromArray(array $config)
     {
-        $configKeys = array('database', 'host', 'options', 'password', 'port', 'rdbms', 'username');
+        $validKeys = array('database', 'host', 'options', 'password', 'port', 'rdbms', 'username');
 
-        foreach ($configKeys as $key) {
-            if (isset($config[$key])) {
-                switch ($key) {
-                    case 'database':
-                        $this->setDatabase($config[$key]);
-                        break;
-
-                    case 'host':
-                        $this->setHost($config[$key]);
-                        break;
-
-                    case 'options':
-                        $this->setOptions($config[$key]);
-
-                        break;
-                    case 'password':
-                        $this->setPassword($config[$key]);
-
-                        break;
-                    case 'port':
-                        $this->setPort($config[$key]);
-
-                        break;
-                    case 'rdbms':
-                        $this->setRdbms($config[$key]);
-
-                        break;
-                    case 'username':
-                        $this->setUsername($config[$key]);
-                        break;
-                }
+        foreach($validKeys as $key) {
+            if ($this->_exists($key, $config)) {
+                $this->_config[$key] = $config[$key];
             }
         }
+    }
 
+    private function _exists($key, $config = null) {
+        if ($config === null) {
+            return isset($this->_config[$key]);
+        }
+
+        return isset($config[$key]);
+    }
+
+    private function _isString($key, $trim = true) {
+        $isString = false;
+        $value = &$this->_config[$key];
+
+        if (is_string($value)) {
+            if ($trim) {
+                $value = trim($value);
+            }
+
+            $isString = true;
+        }
+
+        return $isString;
+    }
+
+    private function _isAlpha($key, $trim = true) {
+        $isAlpha = false;
+        $value = &$this->_config[$key];
+
+        if ($this->_isString($key, $trim) && ctype_alpha($value)) {
+            if ($trim) {
+                $value = trim($value);
+            }
+
+            $isAlpha = true;
+        }
+
+        return $isAlpha;
+    }
+
+    private function _isNumeric($key, $intVal = true) {
+        $isNumeric = false;
+        $value = &$this->_config[$key];
+
+        if (is_numeric($value)) {
+            if ($intVal) {
+                $value = intval($value);
+            }
+
+            $isNumeric = true;
+        }
+
+        return $isNumeric;
     }
 
     /**
@@ -68,11 +92,11 @@ class DatabaseConfig
      */
     public function getDatabase()
     {
-        if (!isset($this->_config['database'])) {
-            throw new DatabaseException(ERROR_E00005);
+        if ($this->_isString('database') && !empty($this->_config['database'])) {
+            return $this->_config['database'];
         }
 
-        return $this->_config['database'];
+        throw new DatabaseException(ERROR_E00004);
     }
 
     /**
@@ -80,11 +104,11 @@ class DatabaseConfig
      */
     public function getHost()
     {
-        if (!isset($this->_config['host'])) {
-            throw new DatabaseException(ERROR_E00005);
+        if ($this->_isString('host') && !empty($this->_config['host'])) {
+            return $this->_config['host'];
         }
 
-        return $this->_config['host'];
+        throw new DatabaseException(ERROR_E00004);
     }
 
     /**
@@ -92,7 +116,11 @@ class DatabaseConfig
      */
     public function getOptions()
     {
-        return isset($this->_config['options']) ? $this->_config['options'] : array();
+        if ($this->_exists('options') && is_array($this->_config['options'])) {
+             return $this->_config['options'];
+        }
+
+        return array();
     }
 
     /**
@@ -100,11 +128,11 @@ class DatabaseConfig
      */
     public function getPassword()
     {
-        if (!isset($this->_config['password'])) {
-            throw new DatabaseException(ERROR_E00004);
+        if ($this->_isString('password')) {
+            return $this->_config['password'];
         }
 
-        return $this->_config['password'];
+        return '';
     }
 
     /**
@@ -112,7 +140,11 @@ class DatabaseConfig
      */
     public function getPort()
     {
-        return isset($this->_config['options']) ? $this->_config['options'] : null;
+        if ($this->_isNumeric('port')) {
+            return $this->_config['port'];
+        }
+
+        return null;
     }
 
     /**
@@ -120,11 +152,11 @@ class DatabaseConfig
      */
     public function getUsername()
     {
-        if (!isset($this->_config['username'])) {
-            throw new DatabaseException(ERROR_E00004);
+        if ($this->_isString('username')) {
+            return $this->_config['username'];
         }
 
-        return $this->_config['username'];
+        return '';
     }
 
     /**
@@ -132,135 +164,10 @@ class DatabaseConfig
      */
     public function getRdbms()
     {
-        if (!isset($this->_config['rdbms'])) {
-            throw new DatabaseException(ERROR_E00003);
-        }
-
-        return $this->_config['rdbms'];
-    }
-
-    /**
-     * @param string $database
-     */
-    public function setDatabase($database)
-    {
-        if (is_string($database)) {
-            $database = trim($database);
-
-            if (!empty($database)) {
-                $this->_config['database'] = $database;
-                return;
-            }
-        }
-
-        throw new DatabaseException(ERROR_E00005);
-    }
-
-    /**
-     * @param string $host
-     */
-    public function setHost($host)
-    {
-        if (is_string($host)) {
-            $host = trim($host);
-
-            if (!empty($host)) {
-                $this->_config['host'] = $host;
-                return;
-            }
-        }
-
-        throw new DatabaseException(ERROR_E00005);
-    }
-
-    /**
-     * @param array $options
-     */
-    public function setOptions($options)
-    {
-        if ($options === null) {
-            $this->_config['options'] = array();
-            return;
-        } elseif (is_array($options)) {
-            $this->_config['options'] = $options;
-            return;
-        }
-
-        throw new DatabaseException(ERROR_E00007);
-    }
-
-    /**
-     * @param string $password
-     */
-    public function setPassword($password)
-    {
-        if (is_string($password)) {
-            $password = trim($password);
-
-            if (!empty($password)) {
-                $this->_config['password'] = $password;
-                return;
-            }
-        }
-
-        throw new DatabaseException(ERROR_E00004);
-    }
-
-    /**
-     * @param null|int $port
-     */
-    public function setPort($port)
-    {
-        if ($port === null) {
-            $this->_config['port'] = null;
-            return;
-        } elseif (is_numeric($port)) {
-            $port = intval($port);
-
-            if (is_int($port)) {
-                if ($port > 0 && $port < 65535) {
-                    $this->_config['port'] = $port;
-                    return;
-                }
-
-                throw new DatabaseException(ERROR_E00008);
-            }
-        }
-
-        throw new DatabaseException(ERROR_E00006);
-    }
-
-    /**
-     * @param mixed $rdbms
-     */
-    public function setRdbms($rdbms)
-    {
-        if (is_string($rdbms)) {
-            $rdbms = trim($rdbms);
-
-            if (ctype_alpha($rdbms) && !empty($rdbms)) {
-                $this->_config['rdbms'] = $rdbms;
-                return;
-            }
+        if ($this->_isAlpha('rdbms') && !empty($this->_config['rdbms'])) {
+            return $this->_config['rdbms'];
         }
 
         throw new DatabaseException(ERROR_E00003);
-    }
-
-    /**
-     * @param string $username
-     */
-    public function setUsername($username)
-    {
-        if (is_string($username)) {
-            $username = trim($username);
-
-            if (!empty($username)) {
-                $this->_config['username'] = $username;
-                return;
-            }
-        }
-
-        throw new DatabaseException(ERROR_E00004);
     }
 }
