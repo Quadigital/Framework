@@ -10,7 +10,6 @@
 
 namespace Quadigital\Database\Connector;
 
-
 /**
  * Class ConnectorInterface
  * @package Quadigital\Database\Connector
@@ -20,7 +19,7 @@ interface ConnectorInterface {
     /**
      * Establish a database connection.
      *
-     * @param  array  $options
+     * @param  DatabaseConfig $config
      *
      * @return \PDO
      */

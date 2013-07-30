@@ -10,8 +10,6 @@
 
 namespace Quadigital\Database\Connector;
 
-use Quadigital\Database\Exception\DatabaseException;
-
 /**
  * Class MySqlConnector
  * @package Quadigital\Database\Connector
@@ -21,8 +19,9 @@ class MySqlConnector extends Connector implements ConnectorInterface {
     /**
      * Establish a database connection.
      *
-     * @param  array  $options
-     * @return PDO
+     * @param DatabaseConfig $config
+     *
+     * @return \PDO
      */
     public function connect(DatabaseConfig $config)
     {
@@ -35,7 +34,8 @@ class MySqlConnector extends Connector implements ConnectorInterface {
     /**
      * Create a DSN string from a configuration.
      *
-     * @param  array   $config
+     * @param  DatabaseConfig $config
+     *
      * @return string
      */
     protected function getDsn(DatabaseConfig $config)

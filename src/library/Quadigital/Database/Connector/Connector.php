@@ -9,10 +9,9 @@
  */
 namespace Quadigital\Database\Connector;
 
-use Quadigital\Database\Exception\DatabaseException;
-
 /**
  * Class Connector
+ *
  * @package Quadigital\Database\Connector
  */
 class Connector {
@@ -48,13 +47,13 @@ class Connector {
     /**
      * Create a new \PDO connection.
      *
-     * @param  string  $dsn
-     * @param  array   $config
-     * @param  array   $options
+     * @param  string         $dsn
+     * @param  DatabaseConfig $config
+     * @param  array          $options
      *
      * @return bool successful
      */
-    protected function createConnection($dsn, DatabaseConfig $config, array $options)
+    protected function createConnection($dsn, DatabaseConfig $config, array $options = array())
     {
         return new \PDO($dsn, $config->getUsername(), $config->getPassword(), $options);
     }
