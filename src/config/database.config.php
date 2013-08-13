@@ -9,6 +9,7 @@
  */
 
 return array(
+    'rdbms' => 'mysql',
     'username' => 'root',
     'password' => 'test123',
     'port' => '3306',

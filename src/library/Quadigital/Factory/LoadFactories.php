@@ -62,7 +62,7 @@ class LoadFactories {
                 $factory = $reflectedClass->newInstanceArgs($parameterObjects);
             }
 
-            $result = $factory->start();
+            $result = $factory->make();
 
 
             if ($storage === 'Service') {

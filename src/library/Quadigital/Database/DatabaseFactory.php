@@ -11,7 +11,6 @@
 namespace Quadigital\Database;
 
 use Quadigital\Database\Connector\ConnectorFactory;
-use Quadigital\Database\Exception\DatabaseException;
 use Quadigital\Factory\LibraryCreator;
 
 class DatabaseFactory extends LibraryCreator {
@@ -23,30 +22,22 @@ class DatabaseFactory extends LibraryCreator {
         $this->_dbConfig = $dbConfig;
     }
 
-    private $_dbAdapters = array(
-        'pdo_mysql' => array(
-            'rdbmsType' => 'mysql',
-            'connection' => 'MySqlConnection',
-        ),
-    );
-
     protected function factoryMethod()
     {
-        if (isset($this->_dbConfig['adapter'])) {
-            $adapter = $this->_dbConfig['adapter'];
+        $connectorFactory = new ConnectorFactory($this->_dbConfig);
+        $connection = $connectorFactory->make();
 
-            if (!isset($this->_dbAdapters[strtolower($adapter)])) {
-                    throw new DatabaseException('An invalid/unsupported database adapter was set.');
-            }
+        $connectionDriverName = $connection->getAttribute(\PDO::ATTR_DRIVER_NAME);
+        $connectionInstance = null;
 
-            $dbAdapterSettings = $this->_dbAdapters[$adapter];
-            $connectorFactory = new ConnectorFactory($dbAdapterSettings['rdbmsType'], $this->_dbConfig);
-            $dbConnection = $connectorFactory->make();
-
-            return $dbConnection;
+        switch($connectionDriverName) {
+            case 'mysql':
+                $connectionInstance = new MySqlConnection($connection);
+                break;
+            default:
+                break;
         }
 
-        // No adapter set
-        throw new DatabaseException('No database adapter was set.');
+        return $connectionInstance;
     }
 }

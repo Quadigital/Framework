@@ -47,9 +47,9 @@ class Connector {
     /**
      * Create a new \PDO connection.
      *
-     * @param  string         $dsn
-     * @param  DatabaseConfig $config
-     * @param  array          $options
+     * @param string         $dsn
+     * @param DatabaseConfig $config
+     * @param array          $options
      *
      * @return bool successful
      */

@@ -19,7 +19,7 @@ interface ConnectorInterface {
     /**
      * Establish a database connection.
      *
-     * @param  DatabaseConfig $config
+     * @param DatabaseConfig $config
      *
      * @return \PDO
      */

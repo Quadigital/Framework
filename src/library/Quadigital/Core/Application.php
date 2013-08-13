@@ -18,16 +18,15 @@ use Quadigital\Service\ServiceManager;
 class Application {
 
     public function run() {
-        $dbFactory = new DatabaseFactory(include 'config/database.config.php');
-        /** @var ConnectionInterface $connector */
-        $db = $dbFactory->make();
+        $serviceManager = ServiceManager::getServiceMananger();
+        $db = $serviceManager->get('Database');
 
         /** @var \PDOStatement $result */
-        $result = $db->query('select * from user');
+        $result = $db->query('select * from user where Id = ?', array(1));
 
         var_dump($result->fetch());
 
-        $twig = new \Twig_Environment();
+//        new \Twig_Environment();
 
         echo 1;
     }

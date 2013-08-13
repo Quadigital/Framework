@@ -16,6 +16,8 @@ chdir(dirname(dirname(__DIR__)) . '/src');
 include 'library/constants.php';
 //
 include 'library/autoload.php';
+// Include Test autoloader
+include __DIR__ . '/autoload.php';
 
 //
 define('TEST_DIR', ROOT_DIR . DS . DIR_UP . 'tests' . DS);

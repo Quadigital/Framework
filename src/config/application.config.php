@@ -23,15 +23,15 @@ return array(
 //            ),
 //            'Storage' => 'Config',
 //        ),
-//        'Database' => array(
-//            'Class' => 'Quadigital\Database\DatabaseFactory',
-//            'Parameters' => array(
-//                'DatabaseConfigInstance' => array(
-//                    'Storage' => 'Config',
-//                    'Name' => 'DatabaseConfig'
-//                ),
-//            ),
-//            'Storage' => 'Service',
-//        ),
+        'Database' => array(
+            'Class' => 'Quadigital\Database\DatabaseFactory',
+            'Parameters' => array(
+                'DatabaseConfigInstance' => array(
+                    'Storage' => 'Config',
+                    'Name' => 'DatabaseConfig'
+                ),
+            ),
+            'Storage' => 'Service',
+        ),
     ),
 );
