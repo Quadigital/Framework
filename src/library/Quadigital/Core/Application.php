@@ -10,24 +10,27 @@
 
 namespace Quadigital\Core;
 
-
-use Quadigital\Database\ConnectionInterface;
-use Quadigital\Database\DatabaseFactory;
 use Quadigital\Service\ServiceManager;
+use Quadigital\View\Element;
+use Quadigital\View\Grammar\ElementGrammar;
+use Quadigital\View\SEO\Components\TitleView;
+use Quadigital\View\View;
 
 class Application {
 
     public function run() {
-        $serviceManager = ServiceManager::getServiceMananger();
-        $db = $serviceManager->get('Database');
+        $title = new Element('title');
 
-        /** @var \PDOStatement $result */
-        $result = $db->query('select * from user where Id = ?', array(1));
+        $title->setTag('title');
+        $title->setSelfClosing(false);
+        $title->setContents('Primary Keyword - Secondary Keyword | Brand Name');
+        echo $title->render();
+        die();
+        $title = new TitleView('Primary Keyword - Secondary Keyword | Brand Name');
+        echo $title->isValid() ? 'yes' : 'no';
 
-        var_dump($result->fetch());
-
-//        new \Twig_Environment();
-
-        echo 1;
+        include ('tmp/TestView.php');
+        $testView = new \TestView();
+        echo $testView->render();
     }
 }

@@ -44,4 +44,17 @@ class Connector_Test extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($connector->getOptions(), $defaultOptions);
     }
+
+    public function test_optionsMergeSame()
+    {
+        $connector = new \Quadigital\Database\Connector\Connector();
+        $defaultOptions = QdReflection::getProperty($connector, '_options');
+
+        foreach ($defaultOptions as $key => $value) {
+            $defaultOptions[$key] = 'New value'; // Check value is overridden on used keys.
+            $defaultOptions[$key . ' This is a new key'] = 'New key value'; // Check addition of new keys.
+        }
+
+        $this->assertEquals($connector->getOptions($defaultOptions), $defaultOptions);
+    }
 }

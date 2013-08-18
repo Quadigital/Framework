@@ -60,8 +60,10 @@ if (defined('ENVIRONMENT') && file_exists('library/'.ENVIRONMENT.'-constants.php
  *   Load application autoloader
  * ------------------------------------------------------
  */
-if (file_exists(LIBRARY_DIR . 'autoload.php')) {
-    require LIBRARY_DIR . 'autoload.php';
+if (file_exists(LIBRARY_DIR . '/Loader/StandardAutoloader.php')) {
+    require LIBRARY_DIR . '/Loader/StandardAutoloader.php';
+
+    (new Quadigital\Loader\StandardAutoloader())->register();
 } else {
     exit('The application constants could not be found. E000003');
 }
@@ -75,6 +77,45 @@ if (file_exists(ROOT_DIR . '/vendor/autoload.php')) {
     require ROOT_DIR . '/vendor/autoload.php';
 } else {
     exit('The vendor autoloader couldn\'t be found. E000003');
+}
+
+/*
+ * ------------------------------------------------------
+ *   Load Hook Functions
+ * ------------------------------------------------------
+ */
+if (file_exists(LIBRARY_DIR . '/Quadigital/Hooks/Hooks.php')) {
+    require LIBRARY_DIR . '/Quadigital/Hooks/Hooks.php';
+}
+if (file_exists(LIBRARY_DIR . '/Quadigital/Hooks/Filters.php')) {
+    require LIBRARY_DIR . '/Quadigital/Hooks/Filters.php';
+}
+
+register_filter('render_element_title', '');
+
+function isValid(\Quadigital\View\Element $element) {
+    return $this->isValid_length($element) && $this->isValid_format($element);
+}
+
+function isValid_length(\Quadigital\View\Element $element) {
+    return count($this->title) < self::SEO_FRIENDLY_TITLE_LENGTH;
+}
+
+function isValid_format(\Quadigital\View\Element $element) {
+    // Primary Keyword - Secondary Keyword | Brand Name
+    $format1 = '/^.*?' . // Primary Keyword
+        '(\\s+)(-)(\\s+)' . // ' - '
+        '.*?' . // Secondary Keyword
+        '(\\s+)(\\|)(\\s+)' . // ' | '
+        '.*?/'; // Brand Name
+
+    // Brand Name | Primary Keyword and Secondary Keyword
+    $format2 = '/^.*?' . // Primary Keyword
+        '(\\s+)(\\|)(\\s+)' . // ' | '
+        '.*?/'; // Brand Name
+
+    return preg_match($format2, $element->title) === 1 ||
+    preg_match($format1, $this->title) === 1;
 }
 
 /*
@@ -143,5 +184,18 @@ if ($configManager->exists('factories')) {
  *   Launch the application
  * ------------------------------------------------------
  */
+
+function footerHookTest() {
+    return 'footerHookTest(); Completed.';
+}
+
+register_hook('render_view_footer', 'footerHookTest');
+
+// Call bootstrap hook before app is run.
+call_hook('bootstrap');
+
 $app = new \Quadigital\Core\Application();
 $app->run();
+
+// Call shutdown hook because app has finished running.
+call_hook('shutdown');
